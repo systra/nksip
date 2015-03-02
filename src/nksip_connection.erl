@@ -396,11 +396,13 @@ handle_info({ssl_closed, Socket}, #state{socket=Socket}=State) ->
     do_stop(normal, State);
 
 % Received from Ranch when the listener is ready
-handle_info({shoot, _ListenerPid}, #state{proto=tcp, socket=Socket}=State) ->
+handle_info({shoot, _Ref, Transport, Sock, AckTimeout}, #state{proto=tcp, socket=Socket} = State) ->
+    Transport:accept_ack(Sock, AckTimeout),
     inet:setopts(Socket, [{active, once}]),
     do_noreply(State);
 
-handle_info({shoot, _ListenerPid}, #state{proto=tls, socket=Socket}=State) ->
+handle_info({shoot, _Ref, Transport, Sock, AckTimeout}, #state{proto=tls, socket=Socket} = State) ->
+    Transport:accept_ack(Sock, AckTimeout),
     ssl:setopts(Socket, [{active, once}]),
     do_noreply(State);
 
