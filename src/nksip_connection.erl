@@ -34,7 +34,6 @@
 -include_lib("wsock/include/wsock.hrl").
 
 -define(MAX_MSG, 65535).
--define(MAX_UDP, 1500).
 
 
 %% ===================================================================
@@ -97,9 +96,6 @@ send(Pid, Packet) when is_binary(Packet) ->
 
 
 %% @private
-do_send(_Pid, udp, Packet) when byte_size(Packet) > ?MAX_UDP ->
-    udp_too_large;
-
 do_send(Pid, _Proto, Packet) ->
     case catch gen_server:call(Pid, {send, Packet}, 30000) of
         ok -> ok;
